@@ -52,30 +52,33 @@ app.post('/register', async (req, res) => {
   // ... (continue with the previous code)
   
 // Login endpoint
+// Login endpoint
 app.post('/login', async (req, res) => {
-    try {
-      const { nim, password } = req.body;
-  
-      // Check if user with the given nim exists
-      const user = await User.findOne({ nim });
-      if (!user) {
-        return res.status(400).json({ message: 'User not found' });
-      }
-  
-      // Check if the provided password is correct
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return res.status(401).json({ message: 'Invalid password' });
-      }
-  
-      // Create and send a JWT token
-      const token = jwt.sign({ _id: user._id }, 'your_secret_key');
-      res.header('auth-token', token).json({ success: true, message: 'Berhasil login', token });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal Server Error' });
+  try {
+    const { nim, password } = req.body;
+
+    // Check if user with the given nim exists
+    const user = await User.findOne({ nim });
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'User not found' });
     }
-  });
+
+    // Check if the provided password is correct
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ success: false, message: 'Invalid password' });
+    }
+
+    console.log('Login success');
+    // Create and send a JWT token
+    const token = jwt.sign({ _id: user._id }, 'your_secret_key');
+    res.header('auth-token', token).json({ success: true, message: 'Berhasil login', token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
 
 // Create Surat
 app.post('/surat', async (req, res) => {
